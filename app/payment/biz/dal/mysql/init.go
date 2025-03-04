@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/XJTU-zxc/GoTikMall/app/payment/biz/model"
 	"github.com/XJTU-zxc/GoTikMall/app/payment/conf"
 
 	"gorm.io/driver/mysql"
@@ -26,9 +27,9 @@ func Init() {
 	if err != nil {
 		panic(err)
 	}
-	// if os.Getenv("GO_ENV") != "online" {
-	// 	DB.AutoMigrate( //nolint:errcheck
-	// 		&model.PaymentLog{},
-	// 	)
-	// }
+	if os.Getenv("GO_ENV") != "online" {
+		DB.AutoMigrate(
+			&model.PaymentLog{},
+		)
+	}
 }

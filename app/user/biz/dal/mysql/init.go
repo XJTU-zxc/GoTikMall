@@ -29,7 +29,7 @@ func Init() {
 	}
 	if os.Getenv("GO_ENV") != "online" {
 		needDemoData := !DB.Migrator().HasTable(&model.User{})
-		DB.AutoMigrate( //nolint:errcheck
+		DB.AutoMigrate(
 			&model.User{},
 		)
 		if needDemoData {

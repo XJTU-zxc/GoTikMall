@@ -3,7 +3,7 @@ module github.com/XJTU-zxc/GoTikMall/app/common
 go 1.23.6
 
 require (
-	github.com/cloudwego/kitex v0.12.2
+	github.com/cloudwego/kitex v0.12.3
 	github.com/kitex-contrib/obs-opentelemetry v0.2.9
 	github.com/kitex-contrib/registry-consul v0.1.0
 )
@@ -18,7 +18,7 @@ require (
 	github.com/cloudwego/dynamicgo v0.5.2 // indirect
 	github.com/cloudwego/fastpb v0.0.5 // indirect
 	github.com/cloudwego/frugal v0.2.3 // indirect
-	github.com/cloudwego/gopkg v0.1.4-0.20241217093255-8980b14172b7 // indirect
+	github.com/cloudwego/gopkg v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/cloudwego/localsession v0.1.2 // indirect
 	github.com/cloudwego/netpoll v0.6.5 // indirect

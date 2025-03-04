@@ -31,7 +31,6 @@ func Init() {
 	// }
 	fmt.Println("mysql init success")
 	if os.Getenv("GO_ENV") != "online" {
-		//nolint:errcheck
 		DB.AutoMigrate(
 			&model.Cart{},
 		)
