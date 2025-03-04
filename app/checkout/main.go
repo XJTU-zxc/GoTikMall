@@ -6,7 +6,8 @@ import (
 
 	"github.com/XJTU-zxc/GoTikMall/app/checkout/biz/dal"
 	"github.com/XJTU-zxc/GoTikMall/app/checkout/conf"
-	"github.com/XJTU-zxc/GoTikMall/app/checkout/rpc"
+	"github.com/XJTU-zxc/GoTikMall/app/checkout/infra/mq"
+	"github.com/XJTU-zxc/GoTikMall/app/checkout/infra/rpc"
 	"github.com/XJTU-zxc/GoTikMall/rpc_gen/kitex_gen/checkout/checkoutservice"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
@@ -26,6 +27,7 @@ func main() {
 
 	dal.Init()
 
+	mq.Init()
 	rpc.InitClient()
 
 	opts := kitexInit()

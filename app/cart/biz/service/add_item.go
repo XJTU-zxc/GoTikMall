@@ -5,7 +5,7 @@ import (
 
 	"github.com/XJTU-zxc/GoTikMall/app/cart/biz/dal/mysql"
 	"github.com/XJTU-zxc/GoTikMall/app/cart/biz/model"
-	"github.com/XJTU-zxc/GoTikMall/app/cart/rpc"
+	"github.com/XJTU-zxc/GoTikMall/app/cart/infra/rpc"
 	cart "github.com/XJTU-zxc/GoTikMall/rpc_gen/kitex_gen/cart"
 	"github.com/XJTU-zxc/GoTikMall/rpc_gen/kitex_gen/product"
 	"github.com/cloudwego/kitex/pkg/kerrors"

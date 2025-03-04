@@ -4,10 +4,11 @@ import (
 	"net"
 	"time"
 
-	"github.com/XJTU-zxc/GoTikMall/app/cart/conf"
-	"github.com/XJTU-zxc/GoTikMall/app/cart/infra/rpc"
-	"github.com/XJTU-zxc/GoTikMall/app/cart/biz/dal"
-	"github.com/XJTU-zxc/GoTikMall/rpc_gen/kitex_gen/cart/cartservice"
+	"github.com/XJTU-zxc/GoTikMall/app/email/biz/consumer"
+	"github.com/XJTU-zxc/GoTikMall/app/email/biz/dal"
+	"github.com/XJTU-zxc/GoTikMall/app/email/conf"
+	"github.com/XJTU-zxc/GoTikMall/app/email/infra/mq"
+	"github.com/XJTU-zxc/GoTikMall/rpc_gen/kitex_gen/email/emailservice"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
@@ -26,11 +27,12 @@ func main() {
 
 	dal.Init()
 
-	rpc.InitClient()
+	mq.Init()
+	consumer.Init()
 
 	opts := kitexInit()
 
-	svr := cartservice.NewServer(new(CartServiceImpl), opts...)
+	svr := emailservice.NewServer(new(EmailServiceImpl), opts...)
 
 	err = svr.Run()
 	if err != nil {

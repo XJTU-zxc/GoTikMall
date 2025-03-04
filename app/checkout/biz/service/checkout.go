@@ -5,14 +5,18 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/XJTU-zxc/GoTikMall/app/checkout/rpc"
+	"github.com/XJTU-zxc/GoTikMall/app/checkout/infra/mq"
+	"github.com/XJTU-zxc/GoTikMall/app/checkout/infra/rpc"
 	"github.com/XJTU-zxc/GoTikMall/rpc_gen/kitex_gen/cart"
 	checkout "github.com/XJTU-zxc/GoTikMall/rpc_gen/kitex_gen/checkout"
+	"github.com/XJTU-zxc/GoTikMall/rpc_gen/kitex_gen/email"
 	"github.com/XJTU-zxc/GoTikMall/rpc_gen/kitex_gen/order"
 	"github.com/XJTU-zxc/GoTikMall/rpc_gen/kitex_gen/payment"
 	"github.com/XJTU-zxc/GoTikMall/rpc_gen/kitex_gen/product"
 	"github.com/cloudwego/kitex/pkg/kerrors"
 	"github.com/cloudwego/kitex/pkg/klog"
+	"github.com/nats-io/nats.go"
+	"google.golang.org/protobuf/proto"
 )
 
 type CheckoutService struct {
@@ -93,7 +97,7 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 		err = fmt.Errorf("PlaceOrder.err:%v", err)
 		return
 	}
-	klog.Info("orderResult", orderResult)
+	klog.Info(orderResult)
 
 	// empty cart
 	emptyResult, err := rpc.CartClient.EmptyCart(s.ctx, &cart.EmptyCartReq{UserId: req.UserId})
@@ -105,7 +109,7 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 
 	// charge
 	var orderId string
-	if orderResult != nil || orderResult.Order != nil {
+	if orderResult != nil && orderResult.Order != nil {
 		orderId = orderResult.Order.OrderId
 	}
 	payReq := &payment.ChargeReq{
@@ -124,9 +128,19 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 		klog.Error(err.Error())
 		return nil, err
 	}
+	// send email message
+	data, _ := proto.Marshal(&email.EmailReq{
+		From:        "from@example.com",
+		To:          req.Email,
+		ContentType: "text/plain",
+		Subject:     "You have just created an order in GoTikMall",
+		Content:     "You have just created an order in GoTikMall",
+	})
+	msg := &nats.Msg{Subject: "email", Data: data, Header: make(nats.Header)}
+	_ = mq.Nc.PublishMsg(msg)
+	klog.Info(paymentResult)
 
 	// change order state
-	klog.Info(orderResult)
 	_, err = rpc.OrderClient.MarkOrderPaid(s.ctx, &order.MarkOrderPaidReq{UserId: req.UserId, OrderId: orderId})
 	if err != nil {
 		klog.Error(err)
