@@ -128,6 +128,7 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 		klog.Error(err.Error())
 		return nil, err
 	}
+
 	// send email message
 	data, _ := proto.Marshal(&email.EmailReq{
 		From:        "from@example.com",
