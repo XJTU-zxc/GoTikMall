@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 
 	"github.com/XJTU-zxc/GoTikMall/app/checkout/infra/mq"
@@ -16,6 +15,8 @@ import (
 	"github.com/cloudwego/kitex/pkg/kerrors"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/nats-io/nats.go"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -94,7 +95,7 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 	}
 	orderResult, err := rpc.OrderClient.PlaceOrder(s.ctx, orderReq)
 	if err != nil {
-		err = fmt.Errorf("PlaceOrder.err:%v", err)
+		klog.Error(err.Error())
 		return
 	}
 	klog.Info(orderResult)
@@ -138,6 +139,8 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 		Content:     "You have just created an order in GoTikMall",
 	})
 	msg := &nats.Msg{Subject: "email", Data: data, Header: make(nats.Header)}
+	// open telemetry tracing
+	otel.GetTextMapPropagator().Inject(s.ctx, propagation.HeaderCarrier(msg.Header))
 	_ = mq.Nc.PublishMsg(msg)
 	klog.Info(paymentResult)
 

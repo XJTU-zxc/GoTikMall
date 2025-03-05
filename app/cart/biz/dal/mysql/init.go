@@ -9,6 +9,7 @@ import (
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/plugin/opentelemetry/tracing"
 )
 
 var (
@@ -26,10 +27,11 @@ func Init() {
 	if err != nil {
 		panic(err)
 	}
-	// if err := DB.Use(tracing.NewPlugin(tracing.WithoutMetrics(), tracing.WithTracerProvider(mtl.TracerProvider))); err != nil {
-	// 	panic(err)
-	// }
-	fmt.Println("mysql init success")
+
+	if err := DB.Use(tracing.NewPlugin(tracing.WithoutMetrics())); err != nil {
+		panic(err)
+	}
+	
 	if os.Getenv("GO_ENV") != "online" {
 		DB.AutoMigrate(
 			&model.Cart{},

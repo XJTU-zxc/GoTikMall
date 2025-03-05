@@ -22,12 +22,12 @@ func (s CommonServerSuite) Options() []server.Option {
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
 			ServiceName: s.CurrentServerName,
 		}),
-		server.WithSuite(tracing.NewServerSuite()),
 		server.WithTracer(prometheus.NewServerTracer(
 			"", "",
 			prometheus.WithDisableServer(true), prometheus.WithRegistry(mtl.Registry),
 		),
 		),
+		server.WithSuite(tracing.NewServerSuite()),
 	}
 
 	r, err := consul.NewConsulRegister(s.RegistryAddr)
