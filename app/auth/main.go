@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/XJTU-zxc/GoTikMall/app/auth/biz/dal"
+	"github.com/XJTU-zxc/GoTikMall/app/auth/biz/jwtutil"
 	"github.com/XJTU-zxc/GoTikMall/app/auth/conf"
 	"github.com/XJTU-zxc/GoTikMall/common/mtl"
 	"github.com/XJTU-zxc/GoTikMall/common/serversuite"
@@ -33,6 +34,8 @@ func main() {
 
 	p := mtl.InitTracing(ServiceName)
 	defer p.Shutdown(context.Background()) // nolint:errcheck
+
+	jwtutil.InitAuth()
 
 	dal.Init()
 

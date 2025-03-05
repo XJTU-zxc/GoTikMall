@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+
+	"github.com/XJTU-zxc/GoTikMall/app/auth/biz/jwtutil"
 	auth "github.com/XJTU-zxc/GoTikMall/rpc_gen/kitex_gen/auth"
 )
 
@@ -15,6 +17,9 @@ func NewDeliverTokenByRPCService(ctx context.Context) *DeliverTokenByRPCService 
 // Run create note info
 func (s *DeliverTokenByRPCService) Run(req *auth.DeliverTokenReq) (resp *auth.DeliveryResp, err error) {
 	// Finish your business logic.
-
-	return
+	token, err := jwtutil.GenerateToken(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return &auth.DeliveryResp{Token: token}, nil
 }
