@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/cloudwego/kitex/pkg/klog"
+	// "github.com/kitex-contrib/config-consul/consul"
 	"github.com/kr/pretty"
 	"gopkg.in/validator.v2"
 	"gopkg.in/yaml.v2"
@@ -78,6 +79,20 @@ func initConf() {
 	}
 	conf.Env = GetEnv()
 	pretty.Printf("%+v\n", conf)
+	// client, err := consul.NewClient(consul.Options{
+	// 	Addr: "localhost:8500",
+	// })
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// client.RegisterConfigCallback("product/test.yaml", consul.AllocateUniqueID(), func(s string, cp consul.ConfigParser) {
+	// 	err = yaml.Unmarshal([]byte(s), &conf)
+	// 	if err != nil {
+	// 		klog.Error("parse yaml error - %v", err)
+	// 		panic(err)
+	// 	}
+	// 	pretty.Printf("%+v\n", conf)
+	// })
 }
 
 func GetEnv() string {

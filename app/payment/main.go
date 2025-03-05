@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"net"
 	"time"
 
@@ -18,7 +19,7 @@ import (
 )
 
 var (
-	serviceName  = conf.GetConf().Kitex.Service
+	ServiceName  = conf.GetConf().Kitex.Service
 	RegisterAddr = conf.GetConf().Registry.RegistryAddress[0]
 )
 
@@ -27,10 +28,12 @@ func main() {
 	if err != nil {
 		klog.Error(err.Error())
 	}
-	mtl.InitMetric(serviceName, conf.GetConf().Kitex.MetircsPort, RegisterAddr)
-
-	dal.Init()
+	mtl.InitMetric(ServiceName, conf.GetConf().Kitex.MetircsPort, RegisterAddr)
+	p := mtl.InitTracing(ServiceName)
+	defer p.Shutdown(context.Background()) // nolint:errcheck
 	
+	dal.Init()
+
 	opts := kitexInit()
 
 	svr := paymentservice.NewServer(new(PaymentServiceImpl), opts...)
@@ -48,7 +51,7 @@ func kitexInit() (opts []server.Option) {
 		panic(err)
 	}
 	opts = append(opts, server.WithServiceAddr(addr), server.WithSuite(serversuite.CommonServerSuite{
-		CurrentServerName: serviceName,
+		CurrentServerName: ServiceName,
 		RegistryAddr:      RegisterAddr,
 	}))
 

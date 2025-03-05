@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"net"
 	"time"
 
@@ -13,13 +14,12 @@ import (
 	"github.com/cloudwego/kitex/server"
 	"github.com/joho/godotenv"
 	kitexlogrus "github.com/kitex-contrib/obs-opentelemetry/logging/logrus"
-	consul "github.com/kitex-contrib/registry-consul"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 var (
-	serviceName  = conf.GetConf().Kitex.Service
+	ServiceName  = conf.GetConf().Kitex.Service
 	RegisterAddr = conf.GetConf().Registry.RegistryAddress[0]
 )
 
@@ -29,7 +29,10 @@ func main() {
 		klog.Error(err.Error())
 	}
 
-	mtl.InitMetric(serviceName, conf.GetConf().Kitex.MetircsPort, RegisterAddr)
+	mtl.InitMetric(ServiceName, conf.GetConf().Kitex.MetircsPort, RegisterAddr)
+
+	p := mtl.InitTracing(ServiceName)
+	defer p.Shutdown(context.Background()) // nolint:errcheck
 
 	dal.Init()
 
@@ -50,17 +53,10 @@ func kitexInit() (opts []server.Option) {
 		panic(err)
 	}
 	opts = append(opts, server.WithServiceAddr(addr), server.WithSuite(serversuite.CommonServerSuite{
-		CurrentServerName: serviceName,
+		CurrentServerName: ServiceName,
 		RegistryAddr:      RegisterAddr,
 	}))
 
-	// service registry
-    r, err := consul.NewConsulRegister(conf.GetConf().Registry.RegistryAddress[0])
-    if err != nil {
-        klog.Fatal(err)
-    }
-	opts = append(opts, server.WithRegistry(r))
-	
 	// klog
 	logger := kitexlogrus.NewLogger()
 	klog.SetLogger(logger)

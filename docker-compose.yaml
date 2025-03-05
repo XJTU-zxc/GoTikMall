@@ -43,7 +43,7 @@ services:
       - 3000:3000
 # observability: traces
   jaeger-all-in-one:
-    container_name: jaeger-all-in-one
+    # container_name: jaeger-all-in-one
     image: jaegertracing/all-in-one:latest
     ports:
       - 16686:16686
