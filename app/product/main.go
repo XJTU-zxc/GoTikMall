@@ -6,9 +6,10 @@ import (
 
 	"github.com/XJTU-zxc/GoTikMall/app/product/biz/dal"
 	"github.com/XJTU-zxc/GoTikMall/app/product/conf"
+	"github.com/XJTU-zxc/GoTikMall/common/mtl"
+	"github.com/XJTU-zxc/GoTikMall/common/serversuite"
 	"github.com/XJTU-zxc/GoTikMall/rpc_gen/kitex_gen/product/productcatalogservice"
 	"github.com/cloudwego/kitex/pkg/klog"
-	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
 	"github.com/joho/godotenv"
 	kitexlogrus "github.com/kitex-contrib/obs-opentelemetry/logging/logrus"
@@ -17,11 +18,19 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
+var (
+	serviceName  = conf.GetConf().Kitex.Service
+	RegisterAddr = conf.GetConf().Registry.RegistryAddress[0]
+)
+
 func main() {
 	err := godotenv.Load()
 	if err != nil {
 		klog.Error(err.Error())
 	}
+
+	mtl.InitMetric(serviceName, conf.GetConf().Kitex.MetircsPort, RegisterAddr)
+
 	dal.Init()
 
 	opts := kitexInit()
@@ -40,11 +49,9 @@ func kitexInit() (opts []server.Option) {
 	if err != nil {
 		panic(err)
 	}
-	opts = append(opts, server.WithServiceAddr(addr))
-
-	// service info
-	opts = append(opts, server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
-		ServiceName: conf.GetConf().Kitex.Service,
+	opts = append(opts, server.WithServiceAddr(addr), server.WithSuite(serversuite.CommonServerSuite{
+		CurrentServerName: serviceName,
+		RegistryAddr:      RegisterAddr,
 	}))
 
 	// service registry
