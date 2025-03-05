@@ -1,0 +1,7 @@
+{
+  "whitelist": [
+    "/product.ProductCatalogService/ListProducts",
+    "/product.ProductCatalogService/GetProduct",
+    "/product.ProductCatalogService/SearchProducts"
+  ]
+}
